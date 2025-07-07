@@ -1,0 +1,51 @@
+{
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features",
+		"editor.formatOnSave": true,
+		"files.trimTrailingWhitespace": true,
+		"files.trimFinalNewlines": true,
+		"files.insertFinalNewline": true
+	},
+	"[al]": {
+		"files.trimTrailingWhitespace": true,
+		"files.trimFinalNewlines": true,
+		"files.insertFinalNewline": true
+	},
+	"al.enableCodeAnalysis": true,
+	"al.codeAnalyzers": [
+		"${CodeCop}",
+		"${UICop}",
+		"${PerTenantExtensionCop}",
+		"${analyzerFolder}BusinessCentral.LinterCop.dll"
+	],
+	"al.ruleSetPath": "./al.ruleset.json",
+	"al.backgroundCodeAnalysis": "Project",
+	"CRS.AlSubFolderName": "Source",
+	"CRS.FileNamePattern": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+	"CRS.FileNamePatternExtensions": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+	"CRS.FileNamePatternPageCustomizations": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+	"CRS.RenameWithGit": true,
+	"CRS.ObjectNamePrefix": "ALLU",
+	"CRS.ObjectNameSuffix": "",
+	"CRS.RemovePrefixFromFilename": true,
+	"alOutline.completionProviders": [
+		"VariableNamesWithType"
+	],
+	"todo-tree.highlights.useColourScheme": true,
+	"todo-tree.general.tags": [
+		"BUG",
+		"HACK",
+		"FIXME",
+		"TODO",
+		"[ ]",
+		"[x]",
+		"REVIEW"
+	],
+	"editor.inlineSuggest.enabled": true,
+	"editor.snippetSuggestions": "bottom",
+	"xliffSync.parseFromDeveloperNote": true,
+	"xliffSync.parseFromDeveloperNoteTrimCharacters": "\"",
+	"xliffSync.replaceTranslationsDuringImport": true,
+	"xliffSync.parseFromDeveloperNoteSeparator": ", #Comment",
+	"xliffSync.parseFromDeveloperNoteOverwrite": true
+}

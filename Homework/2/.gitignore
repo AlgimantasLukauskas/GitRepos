@@ -1,0 +1,33 @@
+# Exclude dot-files and dot-directories
+.*
+# Exclude all app files
+*.app
+
+# Reapply rules to .vscode
+!**/.vscode/
+# Exclude all files from .vscode
+**/.vscode/*
+# Include file settings.json file
+!**/.vscode/settings.json
+# Include file extensions.json file
+!**/.vscode/extensions.json
+# Include file *snippets file
+!**/.vscode/*snippets
+
+# Keep .NET packages
+!**/.netpackages
+
+# Reapply rules to .alpackages
+!**/.alpackages/
+# Exclude all .app fiels from .alpackages
+**/.alpackages/*.app
+# Reapply rules to .alpackages/DEP/
+!**/.alpackages/DEP/
+# Reapply rules to all .app fiels in .alpackages/DEP/
+!**/.alpackages/DEP/*.app
+
+# Exclude global translation file, because it will be created on Build process
+*.g.xlf
+
+# Include .gitignore
+!.gitignore
