@@ -1,124 +1,231 @@
-// Codeunit with validation logic
+/// <summary>
+/// Codeunit for validating Lithuanian personal codes (asmens kodai).
+/// Implements the official Lithuanian personal code validation algorithm.
+/// </summary>
 codeunit 66006 "ALLUPersonalCodeMgt"
 {
-    procedure ValidatePersonalCode(PersonalCode: Text[11]; var ValidationResult: Record "ALLUPersonalCodeResult" temporary)
+    Access = Internal;
+
     var
-        CleanCode: Text[11];
+        // Text constants for error messages
+        EmptyCodeErr: Label 'Personal code cannot be empty';
+        // %1 = actual digit count
+        InvalidLengthErr: Label 'Personal code must contain exactly 11 digits, but %1 digits were provided';
+        // %1 = invalid character, %2 = position
+        InvalidCharacterErr: Label 'Invalid character "%1" at position %2. Personal code must contain only digits';
+        // %1 = invalid digit value
+        InvalidGenderDigitErr: Label 'First digit (gender/century) must be between 1 and 6, but %1 was provided';
+        // %1 = invalid month value
+        InvalidMonthErr: Label 'Invalid month %1. Month must be between 01 and 12';
+        // %1 = invalid day, %2 = month, %3 = year
+        InvalidDayErr: Label 'Invalid day %1 for month %2/%3';
+        // %1 = birth date
+        FutureDateErr: Label 'Birth date %1 cannot be in the future';
+        // %1 = birth date
+        TooOldDateErr: Label 'Birth date %1 is too old to be valid';
+        // %1 = expected checksum, %2 = actual checksum
+        InvalidChecksumErr: Label 'Invalid checksum digit. Expected %1, but got %2';
+        // %1 = century start year, %2 = century end year
+        CenturyFormatTxt: Label '%1-%2';
+
+    /// <summary>
+    /// Validates a Lithuanian personal code and returns detailed validation results.
+    /// </summary>
+    /// <param name="PersonalCode">The personal code to validate (11 digits)</param>
+    /// <param name="ValidationResult">Temporary record containing validation results</param>
+    procedure ValidatePersonalCode(PersonalCode: Text; var ValidationResult: Record "ALLUPersonalCodeResult" temporary)
+    var
+        CleanCode: Text;
         Digits: array[11] of Integer;
-        i: Integer;
-        Gender: Integer;
-        Year: Integer;
-        Month: Integer;
-        Day: Integer;
-        Century: Integer;
-        CenturyYear: Integer;
-        SerialNumber: Integer;
-        Checksum: Integer;
-        CalculatedChecksum: Integer;
+        ValidationErr: Text;
     begin
+        Clear(ValidationResult);
         ValidationResult.Init();
         ValidationResult."Entry No." := 1;
 
-        // Clean the input (remove non-digits)
-        CleanCode := DelChr(PersonalCode, '=', DelChr(PersonalCode, '=', '0123456789'));
-
-        // Check length
-        if StrLen(CleanCode) <> 11 then begin
-            ValidationResult."Is Valid" := false;
-            ValidationResult."Error Message" := 'Personal code must contain exactly 11 digits';
-            ValidationResult.Insert();
+        // Input validation and cleanup
+        if not ValidateAndCleanInput(PersonalCode, CleanCode, ValidationErr) then begin
+            SetValidationError(ValidationResult, ValidationErr);
             exit;
         end;
 
         // Convert to digit array
-        for i := 1 to 11 do begin
-            if not Evaluate(Digits[i], CleanCode[i]) then begin
-                ValidationResult."Is Valid" := false;
-                ValidationResult."Error Message" := 'Personal code must contain only digits';
-                ValidationResult.Insert();
-                exit;
-            end;
-        end;
-
-        // Validate gender/century digit
-        Gender := Digits[1];
-        if (Gender < 1) or (Gender > 6) then begin
-            ValidationResult."Is Valid" := false;
-            ValidationResult."Error Message" := 'First digit (gender/century) must be between 1 and 6';
-            ValidationResult.Insert();
+        if not ConvertToDigitArray(CleanCode, Digits, ValidationErr) then begin
+            SetValidationError(ValidationResult, ValidationErr);
             exit;
         end;
 
-        // Calculate century and year
-        Century := (Gender - 1) div 2;
-        case Century of
-            0:
-                CenturyYear := 1800;
-            1:
-                CenturyYear := 1900;
-            2:
-                CenturyYear := 2000;
+        // Perform comprehensive validation
+        if not PerformValidation(Digits, ValidationResult) then
+            exit;
+
+        // If all validations pass, populate the successful result
+        PopulateValidationResult(Digits, ValidationResult);
+    end;
+
+    local procedure ValidateAndCleanInput(PersonalCode: Text; var CleanCode: Text; var ValidationErr: Text): Boolean
+    begin
+        // Remove whitespace and non-digit characters
+        CleanCode := DelChr(PersonalCode, '=', DelChr(PersonalCode, '=', '0123456789'));
+
+        // Check if input is empty
+        if CleanCode = '' then begin
+            ValidationErr := EmptyCodeErr;
+            exit(false);
         end;
 
+        // Check length
+        if StrLen(CleanCode) <> 11 then begin
+            ValidationErr := StrSubstNo(InvalidLengthErr, StrLen(CleanCode));
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure ConvertToDigitArray(CleanCode: Text; var Digits: array[11] of Integer; var ValidationErr: Text): Boolean
+    var
+        i: Integer;
+        DigitChar: Text[1];
+    begin
+        for i := 1 to 11 do begin
+            DigitChar := CopyStr(CleanCode, i, 1);
+            if not Evaluate(Digits[i], DigitChar) then begin
+                ValidationErr := StrSubstNo(InvalidCharacterErr, DigitChar, i);
+                exit(false);
+            end;
+        end;
+        exit(true);
+    end;
+
+    local procedure PerformValidation(Digits: array[11] of Integer; var ValidationResult: Record "ALLUPersonalCodeResult" temporary): Boolean
+    var
+        ValidationErr: Text;
+        BirthDate: Date;
+    begin
+        // Validate gender/century digit
+        if not ValidateGenderCenturyDigit(Digits[1], ValidationErr) then begin
+            SetValidationError(ValidationResult, ValidationErr);
+            exit(false);
+        end;
+
+        // Extract and validate birth date
+        if not ExtractAndValidateBirthDate(Digits, BirthDate, ValidationErr) then begin
+            SetValidationError(ValidationResult, ValidationErr);
+            exit(false);
+        end;
+
+        // Validate checksum
+        if not ValidateChecksum(Digits, ValidationErr) then begin
+            SetValidationError(ValidationResult, ValidationErr);
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure ValidateGenderCenturyDigit(GenderDigit: Integer; var ValidationErr: Text): Boolean
+    begin
+        if (GenderDigit < 1) or (GenderDigit > 6) then begin
+            ValidationErr := StrSubstNo(InvalidGenderDigitErr, GenderDigit);
+            exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure ExtractAndValidateBirthDate(Digits: array[11] of Integer; var BirthDate: Date; var ValidationErr: Text): Boolean
+    var
+        Year: Integer;
+        Month: Integer;
+        Day: Integer;
+        CenturyYear: Integer;
+    begin
+        // Calculate century and year
+        CenturyYear := GetCenturyYear(Digits[1]);
         Year := CenturyYear + Digits[2] * 10 + Digits[3];
         Month := Digits[4] * 10 + Digits[5];
         Day := Digits[6] * 10 + Digits[7];
 
         // Validate month
         if (Month < 1) or (Month > 12) then begin
-            ValidationResult."Is Valid" := false;
-            ValidationResult."Error Message" := 'Invalid month (must be between 01 and 12)';
-            ValidationResult.Insert();
-            exit;
+            ValidationErr := StrSubstNo(InvalidMonthErr, Month);
+            exit(false);
         end;
 
         // Validate day
         if not ValidateDay(Day, Month, Year) then begin
-            ValidationResult."Is Valid" := false;
-            ValidationResult."Error Message" := 'Invalid day for the specified month';
-            ValidationResult.Insert();
-            exit;
+            ValidationErr := StrSubstNo(InvalidDayErr, Day, Month, Year);
+            exit(false);
         end;
+
+        // Create birth date
+        BirthDate := DMY2Date(Day, Month, Year);
 
         // Check if date is not in the future
-        if DMY2Date(Day, Month, Year) > Today then begin
-            ValidationResult."Is Valid" := false;
-            ValidationResult."Error Message" := 'Birth date cannot be in the future';
-            ValidationResult.Insert();
-            exit;
+        if BirthDate > Today then begin
+            ValidationErr := StrSubstNo(FutureDateErr, BirthDate);
+            exit(false);
         end;
 
-        // Validate checksum
-        Checksum := Digits[11];
-        CalculatedChecksum := CalculateChecksum(Digits);
-
-        if CalculatedChecksum <> Checksum then begin
-            ValidationResult."Is Valid" := false;
-            ValidationResult."Error Message" := 'Invalid checksum digit';
-            ValidationResult.Insert();
-            exit;
+        // Check if date is not too old (reasonable validation)
+        if BirthDate < DMY2Date(1, 1, 1800) then begin
+            ValidationErr := StrSubstNo(TooOldDateErr, BirthDate);
+            exit(false);
         end;
 
-        // If all validations pass, populate the result
-        ValidationResult."Is Valid" := true;
-        if Gender mod 2 = 1 then
-            ValidationResult.Gender := 'Male'
-        else
-            ValidationResult.Gender := 'Female';
+        exit(true);
+    end;
 
-        ValidationResult."Birth Date" := DMY2Date(Day, Month, Year);
-        ValidationResult.Century := Format(CenturyYear + 1) + '-' + Format(CenturyYear + 100);
-        SerialNumber := Digits[8] * 100 + Digits[9] * 10 + Digits[10];
-        ValidationResult."Serial Number" := SerialNumber;
-        ValidationResult.Insert();
+    local procedure ValidateChecksum(Digits: array[11] of Integer; var ValidationErr: Text): Boolean
+    var
+        ExpectedChecksum: Integer;
+        ActualChecksum: Integer;
+    begin
+        ExpectedChecksum := Digits[11];
+        ActualChecksum := CalculateChecksum(Digits);
+
+        if ActualChecksum <> ExpectedChecksum then begin
+            ValidationErr := StrSubstNo(InvalidChecksumErr, ActualChecksum, ExpectedChecksum);
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure GetCenturyYear(GenderDigit: Integer): Integer
+    var
+        Century: Integer;
+    begin
+        Century := (GenderDigit - 1) div 2;
+        case Century of
+            0:
+                exit(1800);
+            1:
+                exit(1900);
+            2:
+                exit(2000);
+            else
+                exit(1900); // Default fallback
+        end;
     end;
 
     local procedure ValidateDay(Day: Integer; Month: Integer; Year: Integer): Boolean
     var
-        DaysInMonth: array[12] of Integer;
-        IsLeapYear: Boolean;
+        DaysInMonth: Integer;
     begin
-        // Days in each month
+        if (Day < 1) then
+            exit(false);
+
+        DaysInMonth := GetDaysInMonth(Month, Year);
+        exit(Day <= DaysInMonth);
+    end;
+
+    local procedure GetDaysInMonth(Month: Integer; Year: Integer): Integer
+    var
+        DaysInMonth: array[12] of Integer;
+        LeapYearFlag: Boolean;
+    begin
+        // Initialize days in each month
         DaysInMonth[1] := 31; // January
         DaysInMonth[2] := 28; // February
         DaysInMonth[3] := 31; // March
@@ -132,12 +239,17 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         DaysInMonth[11] := 30; // November
         DaysInMonth[12] := 31; // December
 
-        // Check for leap year
-        IsLeapYear := ((Year mod 4 = 0) and (Year mod 100 <> 0)) or (Year mod 400 = 0);
-        if IsLeapYear and (Month = 2) then
+        // Adjust for leap year
+        LeapYearFlag := IsLeapYear(Year);
+        if LeapYearFlag and (Month = 2) then
             DaysInMonth[2] := 29;
 
-        exit((Day >= 1) and (Day <= DaysInMonth[Month]));
+        exit(DaysInMonth[Month]);
+    end;
+
+    local procedure IsLeapYear(Year: Integer): Boolean
+    begin
+        exit(((Year mod 4 = 0) and (Year mod 100 <> 0)) or (Year mod 400 = 0));
     end;
 
     local procedure CalculateChecksum(Digits: array[11] of Integer): Integer
@@ -149,29 +261,11 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         i: Integer;
         Result: Integer;
     begin
-        // First set of weights
-        Weights1[1] := 1;
-        Weights1[2] := 2;
-        Weights1[3] := 3;
-        Weights1[4] := 4;
-        Weights1[5] := 5;
-        Weights1[6] := 6;
-        Weights1[7] := 7;
-        Weights1[8] := 8;
-        Weights1[9] := 9;
-        Weights1[10] := 1;
+        // Initialize first set of weights
+        InitializeWeights1(Weights1);
 
-        // Second set of weights
-        Weights2[1] := 3;
-        Weights2[2] := 4;
-        Weights2[3] := 5;
-        Weights2[4] := 6;
-        Weights2[5] := 7;
-        Weights2[6] := 8;
-        Weights2[7] := 9;
-        Weights2[8] := 1;
-        Weights2[9] := 2;
-        Weights2[10] := 3;
+        // Initialize second set of weights
+        InitializeWeights2(Weights2);
 
         // Calculate first sum
         Sum1 := 0;
@@ -191,5 +285,112 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         end;
 
         exit(Result);
+    end;
+
+    local procedure InitializeWeights1(var Weights: array[10] of Integer)
+    begin
+        Weights[1] := 1;
+        Weights[2] := 2;
+        Weights[3] := 3;
+        Weights[4] := 4;
+        Weights[5] := 5;
+        Weights[6] := 6;
+        Weights[7] := 7;
+        Weights[8] := 8;
+        Weights[9] := 9;
+        Weights[10] := 1;
+    end;
+
+    local procedure InitializeWeights2(var Weights: array[10] of Integer)
+    begin
+        Weights[1] := 3;
+        Weights[2] := 4;
+        Weights[3] := 5;
+        Weights[4] := 6;
+        Weights[5] := 7;
+        Weights[6] := 8;
+        Weights[7] := 9;
+        Weights[8] := 1;
+        Weights[9] := 2;
+        Weights[10] := 3;
+    end;
+
+    local procedure PopulateValidationResult(Digits: array[11] of Integer; var ValidationResult: Record "ALLUPersonalCodeResult" temporary)
+    var
+        Year: Integer;
+        Month: Integer;
+        Day: Integer;
+        CenturyYear: Integer;
+        SerialNumber: Integer;
+    begin
+        ValidationResult."Is Valid" := true;
+
+        // Extract gender
+        if Digits[1] mod 2 = 1 then
+            ValidationResult.Gender := 'Male'
+        else
+            ValidationResult.Gender := 'Female';
+
+        // Extract birth date
+        CenturyYear := GetCenturyYear(Digits[1]);
+        Year := CenturyYear + Digits[2] * 10 + Digits[3];
+        Month := Digits[4] * 10 + Digits[5];
+        Day := Digits[6] * 10 + Digits[7];
+        ValidationResult."Birth Date" := DMY2Date(Day, Month, Year);
+
+        // Set century information
+        ValidationResult.Century := StrSubstNo(CenturyFormatTxt, CenturyYear + 1, CenturyYear + 100);
+
+        // Extract serial number
+        SerialNumber := Digits[8] * 100 + Digits[9] * 10 + Digits[10];
+        ValidationResult."Serial Number" := SerialNumber;
+
+        ValidationResult.Insert();
+    end;
+
+    local procedure SetValidationError(var ValidationResult: Record "ALLUPersonalCodeResult" temporary; ErrorMessage: Text)
+    begin
+        ValidationResult."Is Valid" := false;
+        ValidationResult."Error Message" := CopyStr(ErrorMessage, 1, MaxStrLen(ValidationResult."Error Message"));
+        ValidationResult.Insert();
+    end;
+
+    /// <summary>
+    /// Quick validation procedure that returns only boolean result for performance-critical scenarios.
+    /// </summary>
+    /// <param name="PersonalCode">The personal code to validate</param>
+    /// <returns>True if valid, False if invalid</returns>
+    procedure IsValidPersonalCode(PersonalCode: Text): Boolean
+    var
+        TempValidationResult: Record "ALLUPersonalCodeResult" temporary;
+    begin
+        ValidatePersonalCode(PersonalCode, TempValidationResult);
+        exit(TempValidationResult."Is Valid");
+    end;
+
+    /// <summary>
+    /// Extracts gender from a personal code without full validation.
+    /// </summary>
+    /// <param name="PersonalCode">The personal code</param>
+    /// <returns>Gender as text (Male/Female) or empty string if invalid</returns>
+    procedure GetGenderFromPersonalCode(PersonalCode: Text): Text
+    var
+        CleanCode: Text;
+        GenderDigit: Integer;
+    begin
+        CleanCode := DelChr(PersonalCode, '=', DelChr(PersonalCode, '=', '0123456789'));
+        if StrLen(CleanCode) <> 11 then
+            exit('');
+
+        if not Evaluate(GenderDigit, CopyStr(CleanCode, 1, 1)) then
+            exit('');
+
+        if (GenderDigit < 1) or (GenderDigit > 6) then
+            exit('');
+
+        if GenderDigit mod 2 = 1 then
+            exit('Male')
+        else
+            exit('Female');
     end;
 }

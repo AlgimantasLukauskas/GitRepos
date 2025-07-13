@@ -5,6 +5,7 @@ permissionset 66009 "ALLUPersonalCodePerm"
     Caption = 'Personal Code Validation';
     Permissions =
         tabledata "ALLUPersonalCodeVal" = RIMD,
+        tabledata "ALLUPersonalCodeResult" = RIMD,
         table "ALLUPersonalCodeVal" = X,
         table "ALLUPersonalCodeResult" = X,
         page "ALLUPersonalCodeCard" = X,
