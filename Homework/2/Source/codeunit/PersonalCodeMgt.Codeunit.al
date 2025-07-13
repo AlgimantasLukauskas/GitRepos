@@ -9,24 +9,25 @@ codeunit 66006 "ALLUPersonalCodeMgt"
     var
         // Text constants for error messages
         EmptyCodeErr: Label 'Personal code cannot be empty';
-        // %1 = actual digit count
-        InvalidLengthErr: Label 'Personal code must contain exactly 11 digits, but %1 digits were provided';
-        // %1 = invalid character, %2 = position
-        InvalidCharacterErr: Label 'Invalid character "%1" at position %2. Personal code must contain only digits';
-        // %1 = invalid digit value
-        InvalidGenderDigitErr: Label 'First digit (gender/century) must be between 1 and 6, but %1 was provided';
-        // %1 = invalid month value
-        InvalidMonthErr: Label 'Invalid month %1. Month must be between 01 and 12';
-        // %1 = invalid day, %2 = month, %3 = year
-        InvalidDayErr: Label 'Invalid day %1 for month %2/%3';
-        // %1 = birth date
-        FutureDateErr: Label 'Birth date %1 cannot be in the future';
-        // %1 = birth date
-        TooOldDateErr: Label 'Birth date %1 is too old to be valid';
-        // %1 = expected checksum, %2 = actual checksum
-        InvalidChecksumErr: Label 'Invalid checksum digit. Expected %1, but got %2';
-        // %1 = century start year, %2 = century end year
-        CenturyFormatTxt: Label '%1-%2';
+
+        InvalidLengthErr: Label 'Personal code must contain exactly 11 digits, but %1 digits were provided', Comment = '%1 = actual number of digits provided';
+
+        InvalidCharacterErr: Label 'Invalid character "%1" at position %2. Personal code must contain only digits', Comment = '%1 = invalid character, %2 = character position';
+
+        InvalidGenderDigitErr: Label 'First digit (gender/century) must be between 1 and 6, but %1 was provided', Comment = '%1 = invalid first digit';
+
+        InvalidMonthErr: Label 'Invalid month value: %1. Month must be between 01 and 12', Comment = '%1 = invalid month value';
+
+        InvalidDayErr: Label 'Invalid day %1 for month %2 in year %3', Comment = '%1 = day, %2 = month, %3 = year';
+
+        FutureDateErr: Label 'Birth date %1 cannot be in the future', Comment = '%1 = provided birth date';
+
+        TooOldDateErr: Label 'Birth date %1 is too far in the past to be valid', Comment = '%1 = provided birth date';
+
+        InvalidChecksumErr: Label 'Invalid checksum digit. Expected %1, but got %2', Comment = '%1 = expected checksum digit, %2 = provided checksum digit';
+
+        CenturyFormatTxt: Label '%1-%2', Comment = '%1 = century start year, %2 = century end year';
+
 
     /// <summary>
     /// Validates a Lithuanian personal code and returns detailed validation results.
