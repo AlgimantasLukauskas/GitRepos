@@ -56,47 +56,39 @@ codeunit 66003 "Homework"
     // 3. UŽDUOTIS: Besidubliuojančių skaičių paieška
     // ========================================
 
-    local procedure FindDuplicates(var NumberArray: array[100] of Integer; var DuplicateArray: array[100] of Integer; var DuplicateCount: Integer)
+    local procedure FindDuplicates(NumberArray: array[100] of Integer; var DuplicateArray: array[100] of Integer; var DuplicateCount: Integer)
     var
         i, j, k : Integer;
-        IsDuplicate: Boolean;
         AlreadyInDuplicates: Boolean;
     begin
         DuplicateCount := 0;
 
         // Išvalome dublikatų masyvą
-        for k := 1 to 100 do
-            DuplicateArray[k] := 0;
+        // for k := 1 to 100 do
+        //     DuplicateArray[k] := 0;
+        Clear(DuplicateArray); // Review: naudojame Clear() funkciją, kad išvalytume masyvą
 
         // Einame per kiekvieną masyvo elementą
-        for i := 1 to 100 do begin
-            IsDuplicate := false;
+        for i := 1 to ArrayLen(NumberArray) do begin
             AlreadyInDuplicates := false;
 
             // Tikriname, ar šis elementas jau yra dublikatų masyve
-            for k := 1 to DuplicateCount do begin
+            for k := 1 to DuplicateCount do
                 if DuplicateArray[k] = NumberArray[i] then begin
                     AlreadyInDuplicates := true;
                     break;
                 end;
-            end;
 
             // Jei jau yra dublikatų masyve, praleisime
-            if not AlreadyInDuplicates then begin
+            if not AlreadyInDuplicates then
                 // Ieškome, ar tas pats elementas pasikartoja kitur masyve
-                for j := i + 1 to 100 do begin
+                for j := i + 1 to ArrayLen(NumberArray) do
                     if NumberArray[j] = NumberArray[i] then begin
-                        IsDuplicate := true;
+                        // Jei rado dublikatą, pridedame į dublikatų masyvą
+                        DuplicateCount := DuplicateCount + 1;
+                        DuplicateArray[DuplicateCount] := NumberArray[i];
                         break;
                     end;
-                end;
-
-                // Jei rado dublikatą, pridedame į dublikatų masyvą
-                if IsDuplicate then begin
-                    DuplicateCount := DuplicateCount + 1;
-                    DuplicateArray[DuplicateCount] := NumberArray[i];
-                end;
-            end;
         end;
     end;
 
@@ -199,6 +191,7 @@ codeunit 66003 "Homework"
         DuplicateCount: Integer;
         i: Integer;
         DuplicateText: Text;
+        ResultMsg: Label 'Užduotis 3:\Rasta dublikatų: %1\Dublikatų reikšmės: %2', Comment = '%1 = Dublikatų skaičius, %2 = Dublikatų reikšmės';
     begin
         // Generuojame masyvą su mažesniu diapazonu dublikatams
         GenerateRandomArray(NumberArray, 1, 50);
@@ -206,6 +199,7 @@ codeunit 66003 "Homework"
         // Randame dublikatus
         FindDuplicates(NumberArray, DuplicateArray, DuplicateCount);
 
+        // Review: Šis blokas turėtų būti atskiroje funkcijoje
         // Formuojame dublikatų tekstą
         DuplicateText := '';
         for i := 1 to DuplicateCount do begin
@@ -214,7 +208,7 @@ codeunit 66003 "Homework"
             DuplicateText := DuplicateText + Format(DuplicateArray[i]);
         end;
 
-        Message('Užduotis 3:\Masyvo ilgis: 100\Dublikatų kiekis: %1\Dublikatai: %2',
+        Message(ResultMsg,
                 DuplicateCount, DuplicateText);
     end;
 
