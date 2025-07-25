@@ -19,7 +19,7 @@ page 66003 "Instruction"
             group(Instructions)
             {
                 Caption = 'Instrukcijos';
-                field(InstructionText; 'Paspauskite mygtukus viršuje, kad atliktumėte užduoties demonstraciją.')
+                field(InstructionText; InstructionTxt)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -135,4 +135,7 @@ page 66003 "Instruction"
             }
         }
     }
+
+    var
+        InstructionTxt: Label 'Paspauskite mygtukus viršuje, kad atliktumėte užduoties demonstraciją.';
 }
