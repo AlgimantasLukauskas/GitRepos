@@ -47,8 +47,8 @@ codeunit 66003 "Homework"
     begin
         // Generuojame atsitiktinį masyvą
         for i := 1 to 100 do begin
-            RandomValue := Random(MaxValue - MinValue + 1) + MinValue;
-            NumberArray[i] := RandomValue;
+            RandomValue := Random(MaxValue - MinValue + 1) + MinValue; // Review: kodas gudrus, bet rekomenduojama rašyti tiek funkcionalumo kiek naudojama procese. Nesuprantu kam  '+1'
+            NumberArray[i] := RandomValue;                             // funkcija neteisingai dirba su neigiamais rėžiais, nes Random() funkcija grąžina tik teigiamus skaičius
         end;
     end;
 
@@ -171,6 +171,7 @@ codeunit 66003 "Homework"
         MinValue, MaxValue : Integer;
         i: Integer;
         SampleText: Text;
+        ResultMsg: Label 'Užduotis 2:\Mažiausias skaičius: %1\Didžiausias skaičius: %2\Pirmi 10 elementų: %3', Comment = '%1 = Min, %2 = Max, %3 = Pirmi 10 elementų';
     begin
         // Generuojame atsitiktinį masyvą
         GenerateRandomArray(NumberArray, 1, 1000);
@@ -178,6 +179,7 @@ codeunit 66003 "Homework"
         // Randame min ir max
         FindMinMax(NumberArray, MinValue, MaxValue);
 
+        // Review: šitos dalies nebuvo reikalavimuose
         // Parodome pirmus 10 elementų
         SampleText := '';
         for i := 1 to 10 do begin
@@ -186,7 +188,7 @@ codeunit 66003 "Homework"
             SampleText := SampleText + Format(NumberArray[i]);
         end;
 
-        Message('Užduotis 2:\Masyvo ilgis: 100\Mažiausias: %1\Didžiausias: %2\Pirmi 10: %3...',
+        Message(ResultMsg,
                 MinValue, MaxValue, SampleText);
     end;
 
