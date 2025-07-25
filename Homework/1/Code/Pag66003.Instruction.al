@@ -8,7 +8,6 @@ page 66003 "Instruction"
     ApplicationArea = All;
     UsageCategory = Tasks;
     Caption = 'Praktikantų užduočių demonstracija';
-    SourceTable = MyNewTable;
     InsertAllowed = false;
     DeleteAllowed = false;
     ModifyAllowed = false;
@@ -136,14 +135,4 @@ page 66003 "Instruction"
             }
         }
     }
-
-    trigger OnOpenPage()
-    begin
-        // Initialize the page with custom table
-        if not Rec.FindFirst() then begin
-            Rec.Init();
-            Rec.Myfield := 1;
-            Rec.Insert();
-        end;
-    end;
 }
