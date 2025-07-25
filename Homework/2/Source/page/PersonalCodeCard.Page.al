@@ -157,7 +157,7 @@ page 66007 "ALLUPersonalCodeCard"
 
     var
         PersonalCodeInput: Text[11];
-        ValidationResultText: Text[250];
+        ValidationResultText: Text[250]; //Review: kam šis ilgio apribojimas?
         ErrorMessageText: Text[250];
         GenderText: Text[10];
         BirthDateText: Text[20];
@@ -173,7 +173,7 @@ page 66007 "ALLUPersonalCodeCard"
 
 
 
-    local procedure ValidatePersonalCode()
+    local procedure ValidatePersonalCode() //Review: puslapye sudėta procesinė logika, reikėtų iškleti į kodinį
     var
         PersonalCodeVal: Record "ALLUPersonalCodeVal";
         TempValidationResult: Record "ALLUPersonalCodeResult" temporary;
@@ -183,14 +183,14 @@ page 66007 "ALLUPersonalCodeCard"
         Age: Integer;
     begin
         if PersonalCodeInput = '' then begin
-            Message('Please enter a personal code to validate.');
+            Message('Please enter a personal code to validate.'); //Review: Text constants -> labels
             exit;
         end;
 
         PersonalCodeText := PersonalCodeInput;
         PersonalCodeMgt.ValidatePersonalCode(PersonalCodeText, TempValidationResult);
 
-        // Store in history
+        // Store in history //Review: istorija galėtų būti kaupiama kodinyje po patikros
         PersonalCodeVal.Init();
         PersonalCodeVal."Personal Code" := CopyStr(PersonalCodeInput, 1, 11);
         PersonalCodeVal."Validation Date" := CurrentDateTime;
@@ -210,7 +210,7 @@ page 66007 "ALLUPersonalCodeCard"
             ValidationResultText := CopyStr('✓ Valid Personal Code', 1, 250);
             ValidationResultStyle := 'Favorable';
             GenderText := TempValidationResult.Gender;
-            BirthDateText := Format(TempValidationResult."Birth Date", 0, '<Day,2>.<Month,2>.<Year4>');
+            BirthDateText := Format(TempValidationResult."Birth Date", 0, '<Day,2>.<Month,2>.<Year4>'); // Review: Why not use date?
 
             // Calculate age
             BirthDate := TempValidationResult."Birth Date";

@@ -57,17 +57,18 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         end;
 
         // Perform comprehensive validation
-        if not PerformValidation(Digits, ValidationResult) then
-            exit;
+        if not PerformValidation(Digits, ValidationResult) then // Review: Ši funkcija elgiasi lyg būtų pagrindinė taisyklių patikros funcija, bet dalis patikrinimo jau atlikta anksčiau
+            exit;                                               //         Neįgyvendinamas "level of abstraction" principas
 
         // If all validations pass, populate the successful result
         PopulateValidationResult(Digits, ValidationResult);
     end;
 
+    // Review: ši funkcija atlieka du nesusijus veiksmus
     local procedure ValidateAndCleanInput(PersonalCode: Text; var CleanCode: Text; var ValidationErr: Text): Boolean
     begin
         // Remove whitespace and non-digit characters
-        CleanCode := DelChr(PersonalCode, '=', DelChr(PersonalCode, '=', '0123456789'));
+        CleanCode := DelChr(PersonalCode, '=', DelChr(PersonalCode, '=', '0123456789')); // Review: iš pateikto teksto bandome išrinkti skaičius. Ar tai reiškia, kad pateiktas asmens kodas teisingas?
 
         // Check if input is empty
         if CleanCode = '' then begin
@@ -89,10 +90,10 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         i: Integer;
         DigitChar: Text[1];
     begin
-        for i := 1 to 11 do begin
+        for i := 1 to 11 do begin // Review: šioje vietoje tikimės, kad ankstesnis kodas iki čia praleido tik 11 simbolių ilgio tekstą. Jei logika pasikeistų būtų sunku pastebėti problemą
             DigitChar := CopyStr(CleanCode, i, 1);
             if not Evaluate(Digits[i], DigitChar) then begin
-                ValidationErr := StrSubstNo(InvalidCharacterErr, DigitChar, i);
+                ValidationErr := StrSubstNo(InvalidCharacterErr, DigitChar, i); // Review: ši patikra atlieka tą patį, kaip ir ankstesnis funkcionalumas ValidateAndCleanInput() išrinkęs iš teksto tik skaičius
                 exit(false);
             end;
         end;
@@ -163,13 +164,13 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         BirthDate := DMY2Date(Day, Month, Year);
 
         // Check if date is not in the future
-        if BirthDate > Today then begin
-            ValidationErr := StrSubstNo(FutureDateErr, BirthDate);
+        if BirthDate > Today then begin                             // Review: problemos čia nėra, bet klausimas ką mes tikriname - ar asmens kodas korektiškas, ar asmens kodas tikras?
+            ValidationErr := StrSubstNo(FutureDateErr, BirthDate);  //         galime sugeneruoti asmens kodų praeities datomis, kurie nėra tikri
             exit(false);
         end;
 
         // Check if date is not too old (reasonable validation)
-        if BirthDate < DMY2Date(1, 1, 1800) then begin
+        if BirthDate < DMY2Date(1, 1, 1800) then begin             // Review: gimimo metus nulemia GetCenturyYear(), ar čia tikriname šios funkcijos klaidas?
             ValidationErr := StrSubstNo(TooOldDateErr, BirthDate);
             exit(false);
         end;
@@ -197,8 +198,8 @@ codeunit 66006 "ALLUPersonalCodeMgt"
     var
         Century: Integer;
     begin
-        Century := (GenderDigit - 1) div 2;
-        case Century of
+        Century := (GenderDigit - 1) div 2; // Review: Gana paprasta logika paslepiama po matematika ir sunku suprasti prasmę.
+        case Century of                     //         Veikia teisingai, bet sunku pastebėti klaidas ir negauname jokios naudos, tik sunkiau skaityti
             0:
                 exit(1800);
             1:
@@ -206,7 +207,7 @@ codeunit 66006 "ALLUPersonalCodeMgt"
             2:
                 exit(2000);
             else
-                exit(1900); // Default fallback
+                exit(1900); // Default fallback // Review: Nesuprantu šito paskirties
         end;
     end;
 
@@ -269,7 +270,7 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         InitializeWeights2(Weights2);
 
         // Calculate first sum
-        Sum1 := 0;
+        Sum1 := 0; // Review: lokalių kintamųjų inicializuoti nebūtina
         for i := 1 to 10 do
             Sum1 += Digits[i] * Weights1[i];
 
@@ -343,7 +344,7 @@ codeunit 66006 "ALLUPersonalCodeMgt"
         ValidationResult.Century := StrSubstNo(CenturyFormatTxt, CenturyYear + 1, CenturyYear + 100);
 
         // Extract serial number
-        SerialNumber := Digits[8] * 100 + Digits[9] * 10 + Digits[10];
+        SerialNumber := Digits[8] * 100 + Digits[9] * 10 + Digits[10]; // Review: kokia kintamojo SerialNumber paskirtis? Kodėl negalime skaičiavimo rezultato įrašyti tiesiai į lentelę?
         ValidationResult."Serial Number" := SerialNumber;
 
         ValidationResult.Insert();
