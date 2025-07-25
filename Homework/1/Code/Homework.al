@@ -11,15 +11,10 @@ codeunit 66003 "Homework"
     var
         ReversedText: Text;
         i: Integer;
-        TextLength: Integer;
     begin
-        TextLength := StrLen(InputText);
-        ReversedText := '';
-
         // Einame per tekstą nuo galo iki pradžios
-        for i := TextLength downto 1 do begin
+        for i := StrLen(InputText) downto 1 do
             ReversedText := ReversedText + CopyStr(InputText, i, 1);
-        end;
 
         exit(ReversedText);
     end;
@@ -163,10 +158,11 @@ codeunit 66003 "Homework"
     var
         InputText: Text;
         Result: Text;
+        ResultMsg: Label 'Užduotis 1:\Įvestas tekstas: %1\Apverstas tekstas: %2', Comment = '%1 = Originalus tekstas, %2 = Apverstas tekstas';
     begin
         InputText := 'Programuotojas';
         Result := ReverseString(InputText);
-        Message('Užduotis 1:\Įvestas tekstas: %1\Apverstas tekstas: %2', InputText, Result);
+        Message(ResultMsg, InputText, Result);
     end;
 
     procedure RunTask2Demo()
