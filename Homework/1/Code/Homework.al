@@ -100,8 +100,6 @@ codeunit 66003 "Homework"
     var
         i: Integer;
         CurrentChar: Text[1];
-        IsVowel: Boolean;
-        IsLetter: Boolean;
         Vowels: Text;
     begin
         VowelCount := 0;
@@ -113,17 +111,12 @@ codeunit 66003 "Homework"
             CurrentChar := CopyStr(InputText, i, 1);
 
             // Tikriname, ar simbolis yra raidė (supaprastinta versija)
-            IsLetter := IsLetterChar(CurrentChar);
-
-            if IsLetter then begin
+            if IsLetterChar(CurrentChar) then
                 // Tikriname, ar raidė yra balsė
-                IsVowel := StrPos(Vowels, CurrentChar) > 0;
-
-                if IsVowel then
+                if StrPos(Vowels, CurrentChar) > 0 then
                     VowelCount := VowelCount + 1
                 else
                     ConsonantCount := ConsonantCount + 1;
-            end;
         end;
     end;
 
@@ -139,7 +132,7 @@ codeunit 66003 "Homework"
         // Tikrina ar simbolis yra raidė (A-Z, a-z)
         CharCode := Character[1];
         exit(((CharCode >= 65) and (CharCode <= 90)) or ((CharCode >= 97) and (CharCode <= 122)) or
-            (CharCode >= 260)); // Lietuviškos raidės paprastai prasideda nuo 260+
+            (CharCode >= 260)); // Lietuviškos raidės paprastai prasideda nuo 260+ // Review: imti visus simbolius nuo 260 yra netikslu
     end;
 
     // ========================================
@@ -214,15 +207,14 @@ codeunit 66003 "Homework"
 
     procedure RunTask4Demo()
     var
-        TestText: Text;
         VowelCount, ConsonantCount : Integer;
+        TestTextTxt: Label 'Programuotojo ar tiesiog bet kokio IT specialisto profesija taps vis labiau įprasta.';
+        ResultMsg: Label 'Užduotis 4:\Tekstas: %1\Balsių: %2\Priebalsių: %3\Iš viso raidžių: %4', Comment = '%1 = Tekstas, %2 = Balsių skaičius, %3 = Priebalsių skaičius, %4 = Iš viso raidžių';
     begin
-        TestText := 'Programuotojo ar tiesiog bet kokio IT specialisto profesija taps vis labiau įprasta.';
+        CountVowelsAndConsonants(TestTextTxt, VowelCount, ConsonantCount);
 
-        CountVowelsAndConsonants(TestText, VowelCount, ConsonantCount);
-
-        Message('Užduotis 4:\Tekstas: %1\Balsių: %2\Priebalsių: %3\Iš viso raidžių: %4',
-                TestText, VowelCount, ConsonantCount, VowelCount + ConsonantCount);
+        Message(ResultMsg,
+                TestTextTxt, VowelCount, ConsonantCount, VowelCount + ConsonantCount);
     end;
 
     procedure RunAllDemos()
