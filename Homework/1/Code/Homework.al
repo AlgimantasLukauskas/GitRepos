@@ -7,7 +7,7 @@ codeunit 66003 "Homework"
     // 1. UŽDUOTIS: Teksto apvertimas
     // ========================================
 
-    procedure ReverseString(InputText: Text): Text
+    local procedure ReverseString(InputText: Text): Text
     var
         ReversedText: Text;
         i: Integer;
@@ -28,7 +28,7 @@ codeunit 66003 "Homework"
     // 2. UŽDUOTIS: Mažiausio ir didžiausio skaičiaus paieška
     // ========================================
 
-    procedure FindMinMax(var NumberArray: array[100] of Integer; var MinValue: Integer; var MaxValue: Integer)
+    local procedure FindMinMax(var NumberArray: array[100] of Integer; var MinValue: Integer; var MaxValue: Integer)
     var
         i: Integer;
     begin
@@ -45,7 +45,7 @@ codeunit 66003 "Homework"
         end;
     end;
 
-    procedure GenerateRandomArray(var NumberArray: array[100] of Integer; MinValue: Integer; MaxValue: Integer)
+    local procedure GenerateRandomArray(var NumberArray: array[100] of Integer; MinValue: Integer; MaxValue: Integer)
     var
         i: Integer;
         RandomValue: Integer;
@@ -61,7 +61,7 @@ codeunit 66003 "Homework"
     // 3. UŽDUOTIS: Besidubliuojančių skaičių paieška
     // ========================================
 
-    procedure FindDuplicates(var NumberArray: array[100] of Integer; var DuplicateArray: array[100] of Integer; var DuplicateCount: Integer)
+    local procedure FindDuplicates(var NumberArray: array[100] of Integer; var DuplicateArray: array[100] of Integer; var DuplicateCount: Integer)
     var
         i, j, k : Integer;
         IsDuplicate: Boolean;
@@ -109,7 +109,7 @@ codeunit 66003 "Homework"
     // 4. UŽDUOTIS: Balsių ir priebalsių skaičiavimas
     // ========================================
 
-    procedure CountVowelsAndConsonants(InputText: Text; var VowelCount: Integer; var ConsonantCount: Integer)
+    local procedure CountVowelsAndConsonants(InputText: Text; var VowelCount: Integer; var ConsonantCount: Integer)
     var
         i: Integer;
         CurrentChar: Text[1];
