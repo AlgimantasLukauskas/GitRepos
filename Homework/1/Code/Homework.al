@@ -7,19 +7,14 @@ codeunit 66003 "Homework"
     // 1. UŽDUOTIS: Teksto apvertimas
     // ========================================
 
-    procedure ReverseString(InputText: Text): Text
+    local procedure ReverseString(InputText: Text): Text
     var
         ReversedText: Text;
         i: Integer;
-        TextLength: Integer;
     begin
-        TextLength := StrLen(InputText);
-        ReversedText := '';
-
         // Einame per tekstą nuo galo iki pradžios
-        for i := TextLength downto 1 do begin
+        for i := StrLen(InputText) downto 1 do
             ReversedText := ReversedText + CopyStr(InputText, i, 1);
-        end;
 
         exit(ReversedText);
     end;
@@ -28,7 +23,7 @@ codeunit 66003 "Homework"
     // 2. UŽDUOTIS: Mažiausio ir didžiausio skaičiaus paieška
     // ========================================
 
-    procedure FindMinMax(var NumberArray: array[100] of Integer; var MinValue: Integer; var MaxValue: Integer)
+    local procedure FindMinMax(var NumberArray: array[100] of Integer; var MinValue: Integer; var MaxValue: Integer)
     var
         i: Integer;
     begin
@@ -45,15 +40,15 @@ codeunit 66003 "Homework"
         end;
     end;
 
-    procedure GenerateRandomArray(var NumberArray: array[100] of Integer; MinValue: Integer; MaxValue: Integer)
+    local procedure GenerateRandomArray(var NumberArray: array[100] of Integer; MinValue: Integer; MaxValue: Integer)
     var
         i: Integer;
         RandomValue: Integer;
     begin
         // Generuojame atsitiktinį masyvą
         for i := 1 to 100 do begin
-            RandomValue := Random(MaxValue - MinValue + 1) + MinValue;
-            NumberArray[i] := RandomValue;
+            RandomValue := Random(MaxValue - MinValue + 1) + MinValue; // Review: kodas gudrus, bet rekomenduojama rašyti tiek funkcionalumo kiek naudojama procese. Nesuprantu kam  '+1'
+            NumberArray[i] := RandomValue;                             // funkcija neteisingai dirba su neigiamais rėžiais, nes Random() funkcija grąžina tik teigiamus skaičius
         end;
     end;
 
@@ -61,47 +56,39 @@ codeunit 66003 "Homework"
     // 3. UŽDUOTIS: Besidubliuojančių skaičių paieška
     // ========================================
 
-    procedure FindDuplicates(var NumberArray: array[100] of Integer; var DuplicateArray: array[100] of Integer; var DuplicateCount: Integer)
+    local procedure FindDuplicates(NumberArray: array[100] of Integer; var DuplicateArray: array[100] of Integer; var DuplicateCount: Integer)
     var
         i, j, k : Integer;
-        IsDuplicate: Boolean;
         AlreadyInDuplicates: Boolean;
     begin
         DuplicateCount := 0;
 
         // Išvalome dublikatų masyvą
-        for k := 1 to 100 do
-            DuplicateArray[k] := 0;
+        // for k := 1 to 100 do
+        //     DuplicateArray[k] := 0;
+        Clear(DuplicateArray); // Review: naudojame Clear() funkciją, kad išvalytume masyvą
 
         // Einame per kiekvieną masyvo elementą
-        for i := 1 to 100 do begin
-            IsDuplicate := false;
+        for i := 1 to ArrayLen(NumberArray) do begin
             AlreadyInDuplicates := false;
 
             // Tikriname, ar šis elementas jau yra dublikatų masyve
-            for k := 1 to DuplicateCount do begin
+            for k := 1 to DuplicateCount do
                 if DuplicateArray[k] = NumberArray[i] then begin
                     AlreadyInDuplicates := true;
                     break;
                 end;
-            end;
 
             // Jei jau yra dublikatų masyve, praleisime
-            if not AlreadyInDuplicates then begin
+            if not AlreadyInDuplicates then
                 // Ieškome, ar tas pats elementas pasikartoja kitur masyve
-                for j := i + 1 to 100 do begin
+                for j := i + 1 to ArrayLen(NumberArray) do
                     if NumberArray[j] = NumberArray[i] then begin
-                        IsDuplicate := true;
+                        // Jei rado dublikatą, pridedame į dublikatų masyvą
+                        DuplicateCount := DuplicateCount + 1;
+                        DuplicateArray[DuplicateCount] := NumberArray[i];
                         break;
                     end;
-                end;
-
-                // Jei rado dublikatą, pridedame į dublikatų masyvą
-                if IsDuplicate then begin
-                    DuplicateCount := DuplicateCount + 1;
-                    DuplicateArray[DuplicateCount] := NumberArray[i];
-                end;
-            end;
         end;
     end;
 
@@ -109,12 +96,10 @@ codeunit 66003 "Homework"
     // 4. UŽDUOTIS: Balsių ir priebalsių skaičiavimas
     // ========================================
 
-    procedure CountVowelsAndConsonants(InputText: Text; var VowelCount: Integer; var ConsonantCount: Integer)
+    local procedure CountVowelsAndConsonants(InputText: Text; var VowelCount: Integer; var ConsonantCount: Integer)
     var
         i: Integer;
         CurrentChar: Text[1];
-        IsVowel: Boolean;
-        IsLetter: Boolean;
         Vowels: Text;
     begin
         VowelCount := 0;
@@ -126,17 +111,12 @@ codeunit 66003 "Homework"
             CurrentChar := CopyStr(InputText, i, 1);
 
             // Tikriname, ar simbolis yra raidė (supaprastinta versija)
-            IsLetter := IsLetterChar(CurrentChar);
-
-            if IsLetter then begin
+            if IsLetterChar(CurrentChar) then
                 // Tikriname, ar raidė yra balsė
-                IsVowel := StrPos(Vowels, CurrentChar) > 0;
-
-                if IsVowel then
+                if StrPos(Vowels, CurrentChar) > 0 then
                     VowelCount := VowelCount + 1
                 else
                     ConsonantCount := ConsonantCount + 1;
-            end;
         end;
     end;
 
@@ -152,7 +132,7 @@ codeunit 66003 "Homework"
         // Tikrina ar simbolis yra raidė (A-Z, a-z)
         CharCode := Character[1];
         exit(((CharCode >= 65) and (CharCode <= 90)) or ((CharCode >= 97) and (CharCode <= 122)) or
-            (CharCode >= 260)); // Lietuviškos raidės paprastai prasideda nuo 260+
+            (CharCode >= 260)); // Lietuviškos raidės paprastai prasideda nuo 260+ // Review: imti visus simbolius nuo 260 yra netikslu
     end;
 
     // ========================================
@@ -163,10 +143,11 @@ codeunit 66003 "Homework"
     var
         InputText: Text;
         Result: Text;
+        ResultMsg: Label 'Užduotis 1:\Įvestas tekstas: %1\Apverstas tekstas: %2', Comment = '%1 = Originalus tekstas, %2 = Apverstas tekstas';
     begin
         InputText := 'Programuotojas';
         Result := ReverseString(InputText);
-        Message('Užduotis 1:\Įvestas tekstas: %1\Apverstas tekstas: %2', InputText, Result);
+        Message(ResultMsg, InputText, Result);
     end;
 
     procedure RunTask2Demo()
@@ -175,6 +156,7 @@ codeunit 66003 "Homework"
         MinValue, MaxValue : Integer;
         i: Integer;
         SampleText: Text;
+        ResultMsg: Label 'Užduotis 2:\Mažiausias skaičius: %1\Didžiausias skaičius: %2\Pirmi 10 elementų: %3', Comment = '%1 = Min, %2 = Max, %3 = Pirmi 10 elementų';
     begin
         // Generuojame atsitiktinį masyvą
         GenerateRandomArray(NumberArray, 1, 1000);
@@ -182,6 +164,7 @@ codeunit 66003 "Homework"
         // Randame min ir max
         FindMinMax(NumberArray, MinValue, MaxValue);
 
+        // Review: šitos dalies nebuvo reikalavimuose
         // Parodome pirmus 10 elementų
         SampleText := '';
         for i := 1 to 10 do begin
@@ -190,7 +173,7 @@ codeunit 66003 "Homework"
             SampleText := SampleText + Format(NumberArray[i]);
         end;
 
-        Message('Užduotis 2:\Masyvo ilgis: 100\Mažiausias: %1\Didžiausias: %2\Pirmi 10: %3...',
+        Message(ResultMsg,
                 MinValue, MaxValue, SampleText);
     end;
 
@@ -201,6 +184,7 @@ codeunit 66003 "Homework"
         DuplicateCount: Integer;
         i: Integer;
         DuplicateText: Text;
+        ResultMsg: Label 'Užduotis 3:\Rasta dublikatų: %1\Dublikatų reikšmės: %2', Comment = '%1 = Dublikatų skaičius, %2 = Dublikatų reikšmės';
     begin
         // Generuojame masyvą su mažesniu diapazonu dublikatams
         GenerateRandomArray(NumberArray, 1, 50);
@@ -208,6 +192,7 @@ codeunit 66003 "Homework"
         // Randame dublikatus
         FindDuplicates(NumberArray, DuplicateArray, DuplicateCount);
 
+        // Review: Šis blokas turėtų būti atskiroje funkcijoje
         // Formuojame dublikatų tekstą
         DuplicateText := '';
         for i := 1 to DuplicateCount do begin
@@ -216,21 +201,20 @@ codeunit 66003 "Homework"
             DuplicateText := DuplicateText + Format(DuplicateArray[i]);
         end;
 
-        Message('Užduotis 3:\Masyvo ilgis: 100\Dublikatų kiekis: %1\Dublikatai: %2',
+        Message(ResultMsg,
                 DuplicateCount, DuplicateText);
     end;
 
     procedure RunTask4Demo()
     var
-        TestText: Text;
         VowelCount, ConsonantCount : Integer;
+        TestTextTxt: Label 'Programuotojo ar tiesiog bet kokio IT specialisto profesija taps vis labiau įprasta.';
+        ResultMsg: Label 'Užduotis 4:\Tekstas: %1\Balsių: %2\Priebalsių: %3\Iš viso raidžių: %4', Comment = '%1 = Tekstas, %2 = Balsių skaičius, %3 = Priebalsių skaičius, %4 = Iš viso raidžių';
     begin
-        TestText := 'Programuotojo ar tiesiog bet kokio IT specialisto profesija taps vis labiau įprasta.';
+        CountVowelsAndConsonants(TestTextTxt, VowelCount, ConsonantCount);
 
-        CountVowelsAndConsonants(TestText, VowelCount, ConsonantCount);
-
-        Message('Užduotis 4:\Tekstas: %1\Balsių: %2\Priebalsių: %3\Iš viso raidžių: %4',
-                TestText, VowelCount, ConsonantCount, VowelCount + ConsonantCount);
+        Message(ResultMsg,
+                TestTextTxt, VowelCount, ConsonantCount, VowelCount + ConsonantCount);
     end;
 
     procedure RunAllDemos()
@@ -242,152 +226,3 @@ codeunit 66003 "Homework"
     end;
 }
 
-// ========================================
-// PAGE objektas demonstravimui
-// ========================================
-
-page 66003 "Instruction"
-{
-    PageType = Card;
-    ApplicationArea = All;
-    UsageCategory = Tasks;
-    Caption = 'Praktikantų užduočių demonstracija';
-    SourceTable = MyNewTable;
-    InsertAllowed = false;
-    DeleteAllowed = false;
-    ModifyAllowed = false;
-
-    layout
-    {
-        area(Content)
-        {
-            group(Instructions)
-            {
-                Caption = 'Instrukcijos';
-                field(InstructionText; 'Paspauskite mygtukus viršuje, kad atliktumėte užduoties demonstraciją.')
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ShowCaption = false;
-                    Style = Attention;
-                }
-            }
-        }
-    }
-
-    actions
-    {
-        area(Processing)
-        {
-            group(TaskActions)
-            {
-                Caption = 'Užduotys';
-
-                action(RunTask1)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Užduotis 1: Teksto apvertimas';
-                    Image = Process;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    ToolTip = 'Paleisti pirmą užduotį - teksto apvertimas';
-
-                    trigger OnAction()
-                    var
-                        HomeworkTasks: Codeunit "Homework";
-                    begin
-                        HomeworkTasks.RunTask1Demo();
-                    end;
-                }
-
-                action(RunTask2)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Užduotis 2: Min/Max paieška';
-                    Image = Calculate;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    ToolTip = 'Paleisti antrą užduotį - mažiausio ir didžiausio skaičiaus paieška';
-
-                    trigger OnAction()
-                    var
-                        HomeworkTasks: Codeunit "Homework";
-                    begin
-                        HomeworkTasks.RunTask2Demo();
-                    end;
-                }
-
-                action(RunTask3)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Užduotis 3: Dublikatų paieška';
-                    Image = Find;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    ToolTip = 'Paleisti trečią užduotį - besidubliuojančių skaičių paieška';
-
-                    trigger OnAction()
-                    var
-                        HomeworkTasks: Codeunit "Homework";
-                    begin
-                        HomeworkTasks.RunTask3Demo();
-                    end;
-                }
-
-                action(RunTask4)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Užduotis 4: Balsės ir priebalsės';
-                    Image = Text;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    ToolTip = 'Paleisti ketvirtą užduotį - balsių ir priebalsių skaičiavimas';
-
-                    trigger OnAction()
-                    var
-                        HomeworkTasks: Codeunit "Homework";
-                    begin
-                        HomeworkTasks.RunTask4Demo();
-                    end;
-                }
-            }
-
-            group(BatchActions)
-            {
-                Caption = 'Grupės veiksmai';
-
-                action(RunAllTasks)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Paleisti visas užduotis';
-                    Image = ExecuteBatch;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    ToolTip = 'Paleisti visas keturias užduotis iš eilės';
-
-                    trigger OnAction()
-                    var
-                        HomeworkTasks: Codeunit "Homework";
-                    begin
-                        HomeworkTasks.RunAllDemos();
-                    end;
-                }
-            }
-        }
-    }
-
-    trigger OnOpenPage()
-    begin
-        // Initialize the page with custom table
-        if not Rec.FindFirst() then begin
-            Rec.Init();
-            Rec.Myfield := 1;
-            Rec.Insert();
-        end;
-    end;
-}
