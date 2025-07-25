@@ -21,7 +21,6 @@ page 66003 "Instruction"
                 Caption = 'Instrukcijos';
                 field(InstructionText; InstructionTxt)
                 {
-                    ApplicationArea = All;
                     Editable = false;
                     ShowCaption = false;
                     Style = Attention;
@@ -40,7 +39,6 @@ page 66003 "Instruction"
 
                 action(RunTask1)
                 {
-                    ApplicationArea = All;
                     Caption = 'Užduotis 1: Teksto apvertimas';
                     Image = Process;
                     Promoted = true;
@@ -58,7 +56,6 @@ page 66003 "Instruction"
 
                 action(RunTask2)
                 {
-                    ApplicationArea = All;
                     Caption = 'Užduotis 2: Min/Max paieška';
                     Image = Calculate;
                     Promoted = true;
@@ -76,7 +73,6 @@ page 66003 "Instruction"
 
                 action(RunTask3)
                 {
-                    ApplicationArea = All;
                     Caption = 'Užduotis 3: Dublikatų paieška';
                     Image = Find;
                     Promoted = true;
@@ -94,7 +90,6 @@ page 66003 "Instruction"
 
                 action(RunTask4)
                 {
-                    ApplicationArea = All;
                     Caption = 'Užduotis 4: Balsės ir priebalsės';
                     Image = Text;
                     Promoted = true;
@@ -117,7 +112,6 @@ page 66003 "Instruction"
 
                 action(RunAllTasks)
                 {
-                    ApplicationArea = All;
                     Caption = 'Paleisti visas užduotis';
                     Image = ExecuteBatch;
                     Promoted = true;
