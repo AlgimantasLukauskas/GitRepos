@@ -1,0 +1,24 @@
+{
+  "id": "b2919e4b-cdf3-4260-bdf5-6029a4b6a133",
+  "name": "Homework_3",
+  "publisher": "ALLU",
+  "version": "0.0.0.1",
+  "screenshots": [],
+  "platform": "1.0.0.0",
+  "application": "26.0.0.0",
+  "idRanges": [
+    {
+      "from": 66000,
+      "to": 66999
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "15.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}

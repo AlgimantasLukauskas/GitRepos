@@ -1,0 +1,14 @@
+{
+    "recommendations": [
+        "ms-dynamics-smb.al",
+        "waldo.crs-al-language-extension",
+        "vjeko.vjeko-al-objid",
+        "andrzejzwierzchowski.al-code-outline",
+        "davidfeldhoff.al-codeactions",
+        "stefanmaron.businesscentral-lintercop",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "Gruntfuggly.todo-tree",
+        "rvanbekkum.xliff-sync"
+    ]
+}

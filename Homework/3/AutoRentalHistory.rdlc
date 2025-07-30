@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="ReportTitleLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportTitleLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportTitleLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PageLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AutoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AutoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AutoLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PeriodLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PeriodLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PeriodLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RentalHistoryLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RentalHistoryLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RentalHistoryLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DateFromLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DateFromLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DateFromLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DateToLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DateToLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DateToLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CustomerLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CustomerLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CustomerLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AmountLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmountLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmountLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalAmountLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalAmountLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalAmountLbl</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="AutoNo">
+          <DataField>AutoNo</DataField>
+        </Field>
+        <Field Name="AutoName">
+          <DataField>AutoName</DataField>
+        </Field>
+        <Field Name="AutoMark">
+          <DataField>AutoMark</DataField>
+        </Field>
+        <Field Name="AutoModel">
+          <DataField>AutoModel</DataField>
+        </Field>
+        <Field Name="DateFrom">
+          <DataField>DateFrom</DataField>
+        </Field>
+        <Field Name="DateTo">
+          <DataField>DateTo</DataField>
+        </Field>
+        <Field Name="TotalRentalAmount">
+          <DataField>TotalRentalAmount</DataField>
+        </Field>
+        <Field Name="TotalRentalAmountFormat">
+          <DataField>TotalRentalAmountFormat</DataField>
+        </Field>
+        <Field Name="RentNo">
+          <DataField>RentNo</DataField>
+        </Field>
+        <Field Name="RentDateFrom">
+          <DataField>RentDateFrom</DataField>
+        </Field>
+        <Field Name="RentDateTo">
+          <DataField>RentDateTo</DataField>
+        </Field>
+        <Field Name="CustomerNo">
+          <DataField>CustomerNo</DataField>
+        </Field>
+        <Field Name="CustomerName">
+          <DataField>CustomerName</DataField>
+        </Field>
+        <Field Name="RentAmount">
+          <DataField>RentAmount</DataField>
+        </Field>
+        <Field Name="RentAmountFormat">
+          <DataField>RentAmountFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>
