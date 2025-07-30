@@ -1,7 +1,7 @@
 // AL (Application Language) sprendimai praktikantų užduotims
 // Sukurtas kaip Codeunit Business Central sistemoje
 
-codeunit 66003 "Homework"
+codeunit 66002 "Homework"
 {
     // ========================================
     // 1. UŽDUOTIS: Teksto apvertimas

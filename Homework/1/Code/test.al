@@ -1,7 +1,9 @@
-table 66003 MyNewTable
+table 66001 MyNewTable
 {
-    DataClassification = ToBeClassified;
 
+    DataClassification = ToBeClassified;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Table no longer needed';
     fields
     {
         field(1; Myfield; Integer)
